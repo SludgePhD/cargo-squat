@@ -1,0 +1,11 @@
+[package]
+name = "cargo-squat"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+description = "Easily reserve a crates.io package name"
+repository = "https://github.com/SludgePhD/cargo-squat"
+
+[dependencies]
+cargo_metadata = "0.14.2"
+tempfile = "3.3.0"
