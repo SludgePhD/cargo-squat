@@ -3,31 +3,19 @@ use std::{
     error::Error,
     ffi::OsString,
     fs, io,
-    process::{exit, Command},
+    process::{self, exit, Command},
 };
 
-use cargo_metadata::MetadataCommand;
 use tempfile::tempdir;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let args = env::args().skip(2).collect::<Vec<_>>();
+    let args = env::args().skip(1).collect::<Vec<_>>();
+    let args = args.iter().map(|s| &**s).collect::<Vec<_>>();
     let package = match &*args {
-        [] => {
-            let metadata = MetadataCommand::new()
-                .exec()
-                .map_err(|e| format!("failed to run `cargo metadata`: {e}"))?;
-            match metadata.root_package() {
-                Some(pkg) => pkg.name.clone(),
-                None => {
-                    eprintln!("`cargo squat` was invoked on a virtual manifest, invoke it on a real manifest or specify the package name");
-                    exit(1);
-                }
-            }
-        }
-        [package] => package.clone(),
+        [package] | ["cargo-squat", package] => package,
         _ => {
-            eprintln!("usage: cargo squat [<package>]");
-            exit(1);
+            eprintln!("usage: cargo squat <package-name>");
+            process::exit(1);
         }
     };
 
